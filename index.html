@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instant Quote Tool: instant prices on your own website</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #eef4f6; color: #17303a; }
+  header { background: #14586e; color: #fff; padding: 26px 16px; }
+  header .wrap, main { max-width: 980px; margin: 0 auto; }
+  header h1 { margin: 0 0 6px 0; font-size: 28px; }
+  header p { margin: 0; color: #cfe7ee; font-size: 16px; }
+  main { padding: 20px 16px 48px 16px; }
+  .card { background: #fff; border: 1px solid #cfdde2; border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 20px; color: #14586e; }
+  .btn { background: #e07b24; color: #fff; border: none; padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px 8px 0 0; }
+  .btn:disabled { background: #9db8c2; cursor: not-allowed; }
+  .check { font-weight: normal; display: flex; gap: 8px; align-items: flex-start; margin: 10px 0; font-size: 14px; }
+  .check input { width: auto; margin-top: 3px; }
+  .muted { color: #57707b; font-size: 13px; }
+  .notice { background: #fff6e8; border: 1px solid #e0b26a; border-radius: 8px; padding: 14px; }
+  iframe.demo { width: 100%; height: 900px; border: 1px solid #cfdde2; border-radius: 8px; background: #fff; }
+  footer { max-width: 980px; margin: 0 auto; padding: 0 16px 32px 16px; color: #57707b; font-size: 13px; }
+  a { color: #14586e; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  td { border-bottom: 1px solid #e0ebef; padding: 8px 6px; vertical-align: top; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Instant Quote Tool</h1>
+    <p>Instant prices on your own website, from pricing rules you set. Your visitor gets an estimate in seconds, and you get the complete lead the moment they ask.</p>
+  </div>
+</header>
+<main>
+  <div class="card">
+    <h2>What it does</h2>
+    <p>A visitor to your website answers a short set of questions and gets an instant price estimate as a range, calculated from pricing rules you set and can change at any time. You receive the complete lead at once, by text and email, with the job details and the quoted range, and you confirm the final price with the customer before any work is booked. One closed job a month covers the cost several times over at home service prices.</p>
+    <p>Try the working demo below. It runs on two sample businesses with sample prices so you can see exactly what your visitors would see, and exactly what would land in your pocket when a lead arrives.</p>
+  </div>
+
+  <iframe class="demo" src="demo.html" title="Instant Quote Tool working demo"></iframe>
+
+  <div class="card">
+    <h2>One plan, one price</h2>
+    <table>
+      <tr><td><strong>Instant Quote Tool</strong></td><td><strong>$49 a month</strong></td></tr>
+      <tr><td>Setup fee</td><td>None</td></tr>
+      <tr><td>Per lead fee</td><td>None</td></tr>
+      <tr><td>Contract</td><td>Month to month, cancel before the next billing date</td></tr>
+      <tr><td>Seasonal pause</td><td>Free. Pause the subscription in the off season and resume when work picks up</td></tr>
+    </table>
+    <label class="check"><input type="checkbox" id="termsBox" onchange="document.getElementById('buyBtn').disabled = !this.checked"> <span>I accept the terms: $49 a month billed by Matthew Wayne Chance, month to month, cancel before the next billing date, instant prices are estimates from my pricing rules and are confirmed by me before work is booked, and no result is guaranteed. Full terms on the <a href="terms.html">terms page</a>.</span></label>
+    <button class="btn" id="buyBtn" disabled onclick="stagedNotice()">Continue to checkout</button>
+    <div id="buyNotice" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Also free: the WordPress plugin</h2>
+    <p>If your site runs WordPress, the free Instant Quote Tool plugin puts a working quote calculator on your site with email lead delivery, no account and no cost. The paid service adds what a plugin cannot do for itself: the lead by text the moment it arrives, a hosted record of every quote and lead, a text back to your visitor with their estimate, and spam filtering. The plugin listing goes live with the storefront launch.</p>
+  </div>
+</main>
+<footer>
+  <p>Instant Quote Tool is sold by Matthew Wayne Chance, sole proprietor. <a href="terms.html">Terms</a> · <a href="support.html">Support</a></p>
+</footer>
+<script>
+function stagedNotice() {
+  document.getElementById("buyNotice").innerHTML = '<div class="notice"><strong>Checkout is not open yet.</strong> The storefront is built and the billing account is staged; checkout opens at launch, and this button will go straight to Stripe. Nothing was charged.</div>';
+}
+</script>
+</body>
+</html>

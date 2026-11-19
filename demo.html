@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instant Quote Tool, Validation Demo</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f2f5f7; color: #1c2b33; }
+  .banner { background: #7a4b00; color: #fff; padding: 10px 16px; font-size: 14px; text-align: center; }
+  @media (max-width: 600px) { .banner { font-size: 12px; padding: 6px 10px; line-height: 1.35; } }
+  header { background: #0e3a4d; color: #fff; padding: 22px 16px; }
+  header .wrap, main { max-width: 960px; margin: 0 auto; }
+  header h1 { margin: 0 0 6px 0; font-size: 26px; }
+  header p { margin: 0; color: #cfe3ec; font-size: 15px; }
+  nav { background: #ffffff; border-bottom: 1px solid #d5dee3; }
+  nav .wrap { max-width: 960px; margin: 0 auto; padding: 0 8px; display: flex; flex-wrap: wrap; }
+  nav button { background: none; border: none; padding: 14px 14px; font-size: 15px; cursor: pointer; color: #0e3a4d; border-bottom: 3px solid transparent; }
+  nav button.active { border-bottom: 3px solid #e07b24; font-weight: bold; }
+  main { padding: 20px 16px 48px 16px; }
+  .card { background: #fff; border: 1px solid #d5dee3; border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+  h2 { margin-top: 0; font-size: 20px; color: #0e3a4d; }
+  h3 { color: #0e3a4d; margin-bottom: 8px; }
+  label { display: block; font-size: 14px; font-weight: bold; margin: 12px 0 4px 0; }
+  input[type=text], input[type=number], input[type=email], input[type=tel], input[type=date], select, textarea { width: 100%; padding: 9px; border: 1px solid #b9c7cf; border-radius: 5px; font-size: 15px; box-sizing: border-box; background: #fff; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .row .col { flex: 1 1 200px; }
+  .check { font-weight: normal; display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+  .check input { width: auto; }
+  .btn { background: #e07b24; color: #fff; border: none; padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; margin-top: 16px; }
+  .btn.secondary { background: #0e3a4d; }
+  .btn:disabled { background: #9db2bd; cursor: not-allowed; }
+  .result { background: #eef7ee; border: 1px solid #9dc79d; border-radius: 8px; padding: 16px; margin-top: 16px; }
+  .result .big { font-size: 28px; font-weight: bold; color: #145214; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { border-bottom: 1px solid #e1e8ec; padding: 7px 6px; text-align: left; vertical-align: top; }
+  .muted { color: #5a6d77; font-size: 13px; }
+  .lead { border: 1px solid #d5dee3; border-radius: 8px; padding: 14px; margin-bottom: 12px; background: #fbfcfd; }
+  .pill { display: inline-block; background: #0e3a4d; color: #fff; border-radius: 10px; padding: 2px 10px; font-size: 12px; }
+  .notice { background: #fff6e8; border: 1px solid #e0b26a; border-radius: 8px; padding: 14px; }
+  pre { background: #10222b; color: #d7f0d7; padding: 12px; border-radius: 6px; white-space: pre-wrap; font-size: 13px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="banner">Validation demo for the HQ customer eyes pass. Sample businesses with sample prices. No payment is taken, no lead leaves this page, and nothing here is live.</div>
+<header>
+  <div class="wrap">
+    <h1>Instant Quote Tool</h1>
+    <p>A visitor gets an instant price from the business own pricing rules, and the owner gets the complete lead.</p>
+  </div>
+</header>
+<nav>
+  <div class="wrap">
+    <button id="tabQuote" class="active" onclick="showTab('quote')">Get a quote</button>
+    <button id="tabSetup" onclick="showTab('setup')">Business setup</button>
+    <button id="tabLeads" onclick="showTab('leads')">Owner leads <span id="leadCount"></span></button>
+    <button id="tabBilling" onclick="showTab('billing')">Plan and billing</button>
+  </div>
+</nav>
+<main>
+
+<section id="panelQuote">
+  <div class="card">
+    <h2>Get your instant price</h2>
+    <label for="tradeSelect">What do you need?</label>
+    <select id="tradeSelect" onchange="renderQuoteForm()">
+      <option value="pressure">Pressure washing</option>
+      <option value="cleaning">House cleaning</option>
+    </select>
+    <p class="muted" id="bizLine"></p>
+    <div id="quoteFields"></div>
+    <button class="btn" onclick="runQuote()">See my instant price</button>
+    <div id="quoteResult"></div>
+  </div>
+  <div class="card hidden" id="leadCard">
+    <h2>Want this booked in?</h2>
+    <p class="muted">Send your details and the owner gets your job facts and your quoted price right away, then confirms the final price with you before any work is booked.</p>
+    <div class="row">
+      <div class="col"><label for="custName">Your name</label><input type="text" id="custName" placeholder="Jordan Smith"></div>
+      <div class="col"><label for="custPhone">Mobile phone</label><input type="tel" id="custPhone" placeholder="214 555 0142"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label for="custEmail">Email</label><input type="email" id="custEmail" placeholder="you@example.com"></div>
+      <div class="col"><label for="custZip">Property ZIP</label><input type="text" id="custZip" placeholder="76179"></div>
+    </div>
+    <label for="custDate">Preferred date (optional)</label>
+    <input type="date" id="custDate">
+    <label for="custNotes">Anything the owner should know? (optional)</label>
+    <textarea id="custNotes" rows="2"></textarea>
+    <button class="btn secondary" onclick="submitLead()">Send my details to the owner</button>
+    <div id="leadDone"></div>
+  </div>
+</section>
+
+<section id="panelSetup" class="hidden">
+  <div class="card">
+    <h2>Business setup: your prices, your rules</h2>
+    <p class="muted">This is what the owner sees. Change any price and the visitor quote uses it at once. The tool never invents a price: every figure in a quote comes from these rules.</p>
+    <label for="setupTrade">Trade</label>
+    <select id="setupTrade" onchange="renderSetup()">
+      <option value="pressure">Pressure washing</option>
+      <option value="cleaning">House cleaning</option>
+    </select>
+    <div id="setupFields"></div>
+    <button class="btn" onclick="saveSetup()">Save prices</button>
+    <span id="setupSaved" class="muted"></span>
+  </div>
+</section>
+
+<section id="panelLeads" class="hidden">
+  <div class="card">
+    <h2>Owner leads</h2>
+    <p class="muted">Every quote that turns into a lead lands here, with the job facts and the quoted price. The owner also gets a text and an email the moment a lead arrives. Try it: take a quote on the first tab, send your details, then come back here.</p>
+    <div id="leadList"><p class="muted">No leads yet in this demo session.</p></div>
+  </div>
+  <div class="card hidden" id="notifyCard">
+    <h3>What the owner receives</h3>
+    <p><strong>Text message</strong></p>
+    <pre id="notifyText"></pre>
+    <p><strong>Email</strong></p>
+    <pre id="notifyEmail"></pre>
+  </div>
+</section>
+
+<section id="panelBilling" class="hidden">
+  <div class="card">
+    <h2>One plan, one price</h2>
+    <table>
+      <tr><td><strong>Instant Quote Tool</strong></td><td><strong>$49 a month</strong></td></tr>
+      <tr><td>Setup fee</td><td>None</td></tr>
+      <tr><td>Per lead or per quote fee</td><td>None</td></tr>
+      <tr><td>Seasonal pause</td><td>Free, pause and resume any time</td></tr>
+      <tr><td>Contract</td><td>Month to month, cancel any time before the next billing date</td></tr>
+      <tr><td>Includes</td><td>Hosted quote page, website embed, pricing rules editor for your trade, lead inbox, instant text and email lead alerts</td></tr>
+    </table>
+    <label class="check"><input type="checkbox" id="termsBox" onchange="document.getElementById('payBtn').disabled = !this.checked"> I accept the terms: $49 a month billed by Matthew Wayne Chance, month to month, cancel before the next billing date, instant prices are estimates from my pricing rules and are confirmed by me before work is booked, and no result is guaranteed.</label>
+    <button class="btn" id="payBtn" disabled onclick="stagedCheckout()">Continue to payment</button>
+    <div id="payNotice" style="margin-top:14px"></div>
+  </div>
+</section>
+
+</main>
+<script>
+var defaultRules = {
+  pressure: { business: "Lone Star Pressure Washing (sample)", ownerPhone: "817 555 0119", ownerEmail: "owner@lonestarwash.example", houseRate: 0.14, houseMin: 199, drivewayPrice: 129, twoStoryMult: 1.15, condLight: 1.0, condMod: 1.10, condHeavy: 1.25, addSidewalk: 49, addDeck: 99, addFence: 129 },
+  cleaning: { business: "Bluebonnet Home Cleaning (sample)", ownerPhone: "214 555 0173", ownerEmail: "owner@bluebonnetclean.example", rate: 0.15, min: 159, bathPrice: 25, petPrice: 25, condTidy: 1.0, condAvg: 1.10, condWork: 1.30, addFridge: 35, addOven: 35, addWindows: 59, addLaundry: 25, discWeekly: 0.85, discBiweekly: 0.90, discMonthly: 0.95 }
+};
+var rules = JSON.parse(JSON.stringify(defaultRules));
+var leads = [];
+var lastQuote = null;
+
+function roundDollar(x) { return Math.round(x); }
+
+function calculateQuote(trade, inp, r) {
+  var lines = [];
+  var total = 0;
+  if (trade === "pressure") {
+    if (inp.service === "house" || inp.service === "both") {
+      var raw = inp.sqft * r.houseRate;
+      if (Number(inp.stories) === 2) { raw = raw * r.twoStoryMult; }
+      var condMult = inp.condition === "heavy" ? r.condHeavy : (inp.condition === "moderate" ? r.condMod : r.condLight);
+      raw = raw * condMult;
+      var houseAmt = Math.max(roundDollar(raw), r.houseMin);
+      lines.push({ label: "House wash, " + inp.sqft + " sq ft, " + inp.stories + (Number(inp.stories) === 2 ? " stories" : " story") + ", " + inp.condition + " condition", amount: houseAmt });
+      total += houseAmt;
+    }
+    if (inp.service === "driveway" || inp.service === "both") {
+      lines.push({ label: "Driveway and concrete cleaning", amount: r.drivewayPrice });
+      total += r.drivewayPrice;
+    }
+    if (inp.addons.indexOf("sidewalk") >= 0) { lines.push({ label: "Sidewalk and walkway", amount: r.addSidewalk }); total += r.addSidewalk; }
+    if (inp.addons.indexOf("deck") >= 0) { lines.push({ label: "Deck or patio", amount: r.addDeck }); total += r.addDeck; }
+    if (inp.addons.indexOf("fence") >= 0) { lines.push({ label: "Fence wash", amount: r.addFence }); total += r.addFence; }
+  } else {
+    var condMultC = inp.condition === "work" ? r.condWork : (inp.condition === "average" ? r.condAvg : r.condTidy);
+    var baseAmt = roundDollar(inp.sqft * r.rate * condMultC);
+    lines.push({ label: "Cleaning, " + inp.sqft + " sq ft, " + inp.condition + " condition", amount: baseAmt });
+    total += baseAmt;
+    var bathAmt = Number(inp.bathrooms) * r.bathPrice;
+    lines.push({ label: "Bathrooms, " + inp.bathrooms + " at $" + r.bathPrice, amount: bathAmt });
+    total += bathAmt;
+    if (inp.pets) { lines.push({ label: "Pets in the home", amount: r.petPrice }); total += r.petPrice; }
+    if (inp.extras.indexOf("fridge") >= 0) { lines.push({ label: "Inside fridge", amount: r.addFridge }); total += r.addFridge; }
+    if (inp.extras.indexOf("oven") >= 0) { lines.push({ label: "Inside oven", amount: r.addOven }); total += r.addOven; }
+    if (inp.extras.indexOf("windows") >= 0) { lines.push({ label: "Interior windows", amount: r.addWindows }); total += r.addWindows; }
+    if (inp.extras.indexOf("laundry") >= 0) { lines.push({ label: "One load of laundry", amount: r.addLaundry }); total += r.addLaundry; }
+    var disc = inp.visit === "weekly" ? r.discWeekly : (inp.visit === "biweekly" ? r.discBiweekly : (inp.visit === "monthly" ? r.discMonthly : 1));
+    if (disc < 1) {
+      var discAmt = roundDollar(total * (1 - disc));
+      lines.push({ label: "Recurring visit saving", amount: -discAmt });
+      total -= discAmt;
+    }
+    if (total < r.min) {
+      lines.push({ label: "Minimum visit price applied", amount: r.min - total });
+      total = r.min;
+    }
+  }
+  return { lines: lines, total: total, low: roundDollar(total * 0.9), high: roundDollar(total * 1.1) };
+}
+
+function money(x) { return "$" + x.toLocaleString("en-US"); }
+
+function showTab(name) {
+  var panels = { quote: "panelQuote", setup: "panelSetup", leads: "panelLeads", billing: "panelBilling" };
+  var tabs = { quote: "tabQuote", setup: "tabSetup", leads: "tabLeads", billing: "tabBilling" };
+  for (var k in panels) {
+    document.getElementById(panels[k]).classList.toggle("hidden", k !== name);
+    document.getElementById(tabs[k]).classList.toggle("active", k === name);
+  }
+}
+
+function currentTrade() { return document.getElementById("tradeSelect").value; }
+
+function renderQuoteForm() {
+  var trade = currentTrade();
+  var r = rules[trade];
+  document.getElementById("bizLine").textContent = "Priced by " + r.business + " from its own price list. Final price confirmed by the owner before work is booked.";
+  var html = "";
+  if (trade === "pressure") {
+    html += '<label for="qService">Service</label><select id="qService"><option value="house">House wash</option><option value="driveway">Driveway only</option><option value="both">House wash and driveway</option></select>';
+    html += '<div class="row"><div class="col"><label for="qSqft">Home size, square feet</label><input type="number" id="qSqft" value="2200" min="400" step="50"></div>';
+    html += '<div class="col"><label for="qStories">Stories</label><select id="qStories"><option value="1">1 story</option><option value="2">2 stories</option></select></div></div>';
+    html += '<label for="qCondition">How dirty is it?</label><select id="qCondition"><option value="light">Light, mostly dust and pollen</option><option value="moderate">Moderate, visible mildew or stains</option><option value="heavy">Heavy, years of build up</option></select>';
+    html += '<h3>Add ons</h3>';
+    html += '<label class="check"><input type="checkbox" id="qAddSidewalk"> Sidewalk and walkway, ' + money(r.addSidewalk) + '</label>';
+    html += '<label class="check"><input type="checkbox" id="qAddDeck"> Deck or patio, ' + money(r.addDeck) + '</label>';
+    html += '<label class="check"><input type="checkbox" id="qAddFence"> Fence wash, ' + money(r.addFence) + '</label>';
+  } else {
+    html += '<div class="row"><div class="col"><label for="qSqft">Home size, square feet</label><input type="number" id="qSqft" value="1800" min="300" step="50"></div>';
+    html += '<div class="col"><label for="qBaths">Bathrooms</label><input type="number" id="qBaths" value="2" min="1" max="8"></div></div>';
+    html += '<label for="qVisit">Visit type</label><select id="qVisit"><option value="first">First clean or one time</option><option value="weekly">Recurring, weekly</option><option value="biweekly">Recurring, every 2 weeks</option><option value="monthly">Recurring, monthly</option></select>';
+    html += '<label for="qCondition">Condition</label><select id="qCondition"><option value="tidy">Tidy, kept up week to week</option><option value="average">Average, normal build up</option><option value="work">Needs work, heavy build up</option></select>';
+    html += '<label class="check"><input type="checkbox" id="qPets"> Pets in the home, ' + money(r.petPrice) + '</label>';
+    html += '<h3>Extras</h3>';
+    html += '<label class="check"><input type="checkbox" id="qAddFridge"> Inside fridge, ' + money(r.addFridge) + '</label>';
+    html += '<label class="check"><input type="checkbox" id="qAddOven"> Inside oven, ' + money(r.addOven) + '</label>';
+    html += '<label class="check"><input type="checkbox" id="qAddWindows"> Interior windows, ' + money(r.addWindows) + '</label>';
+    html += '<label class="check"><input type="checkbox" id="qAddLaundry"> One load of laundry, ' + money(r.addLaundry) + '</label>';
+  }
+  document.getElementById("quoteFields").innerHTML = html;
+  document.getElementById("quoteResult").innerHTML = "";
+  document.getElementById("leadCard").classList.add("hidden");
+  lastQuote = null;
+}
+
+function readQuoteInputs(trade) {
+  if (trade === "pressure") {
+    var addons = [];
+    if (document.getElementById("qAddSidewalk").checked) { addons.push("sidewalk"); }
+    if (document.getElementById("qAddDeck").checked) { addons.push("deck"); }
+    if (document.getElementById("qAddFence").checked) { addons.push("fence"); }
+    return { service: document.getElementById("qService").value, sqft: Number(document.getElementById("qSqft").value), stories: Number(document.getElementById("qStories").value), condition: document.getElementById("qCondition").value, addons: addons };
+  }
+  var extras = [];
+  if (document.getElementById("qAddFridge").checked) { extras.push("fridge"); }
+  if (document.getElementById("qAddOven").checked) { extras.push("oven"); }
+  if (document.getElementById("qAddWindows").checked) { extras.push("windows"); }
+  if (document.getElementById("qAddLaundry").checked) { extras.push("laundry"); }
+  return { sqft: Number(document.getElementById("qSqft").value), bathrooms: Number(document.getElementById("qBaths").value), visit: document.getElementById("qVisit").value, condition: document.getElementById("qCondition").value, pets: document.getElementById("qPets").checked, extras: extras };
+}
+
+function summariseInputs(trade, inp) {
+  if (trade === "pressure") {
+    return "Service: " + inp.service + ". Home: " + inp.sqft + " sq ft, " + inp.stories + " story. Condition: " + inp.condition + ". Add ons: " + (inp.addons.length ? inp.addons.join(", ") : "none") + ".";
+  }
+  return "Home: " + inp.sqft + " sq ft, " + inp.bathrooms + " bathrooms. Visit: " + inp.visit + ". Condition: " + inp.condition + ". Pets: " + (inp.pets ? "yes" : "no") + ". Extras: " + (inp.extras.length ? inp.extras.join(", ") : "none") + ".";
+}
+
+function runQuote() {
+  var trade = currentTrade();
+  var inp = readQuoteInputs(trade);
+  if (!inp.sqft || inp.sqft <= 0) {
+    document.getElementById("quoteResult").innerHTML = '<div class="notice">Enter a home size so we can price this.</div>';
+    return;
+  }
+  var q = calculateQuote(trade, inp, rules[trade]);
+  lastQuote = { trade: trade, inp: inp, total: q.total, low: q.low, high: q.high, lines: q.lines, summary: summariseInputs(trade, inp), business: rules[trade].business };
+  var html = '<div class="result"><div class="muted">Your instant estimate from ' + rules[trade].business + '</div>';
+  html += '<div class="big">' + money(q.low) + " to " + money(q.high) + '</div>';
+  html += '<table>';
+  for (var i = 0; i < q.lines.length; i++) {
+    html += "<tr><td>" + q.lines[i].label + "</td><td>" + (q.lines[i].amount < 0 ? "-" + money(-q.lines[i].amount) : money(q.lines[i].amount)) + "</td></tr>";
+  }
+  html += '<tr><td><strong>Estimated total, the middle of the range above</strong></td><td><strong>' + money(q.total) + "</strong></td></tr></table>";
+  html += '<p class="muted">This is an instant estimate from the business price list, not a binding quote. The owner confirms the final price with you before any work is booked.</p></div>';
+  document.getElementById("quoteResult").innerHTML = html;
+  document.getElementById("leadCard").classList.remove("hidden");
+  document.getElementById("leadDone").innerHTML = "";
+}
+
+function submitLead() {
+  if (!lastQuote) { return; }
+  var name = document.getElementById("custName").value.trim();
+  var phone = document.getElementById("custPhone").value.trim();
+  if (!name || !phone) {
+    document.getElementById("leadDone").innerHTML = '<div class="notice">Add your name and a mobile number so the owner can reach you.</div>';
+    return;
+  }
+  var lead = {
+    when: new Date().toLocaleString("en-US"),
+    trade: lastQuote.trade, business: lastQuote.business,
+    name: name, phone: phone,
+    email: document.getElementById("custEmail").value.trim(),
+    zip: document.getElementById("custZip").value.trim(),
+    date: document.getElementById("custDate").value,
+    notes: document.getElementById("custNotes").value.trim(),
+    summary: lastQuote.summary, total: lastQuote.total, low: lastQuote.low, high: lastQuote.high,
+    lines: lastQuote.lines, status: "New"
+  };
+  leads.push(lead);
+  document.getElementById("leadDone").innerHTML = '<div class="result"><strong>Sent.</strong> ' + lead.business + " has your job details and your estimate of " + money(lead.low) + " to " + money(lead.high) + ". The owner confirms the final price with you before any work is booked.</div>";
+  renderLeads();
+}
+
+function renderLeads() {
+  document.getElementById("leadCount").textContent = leads.length ? "(" + leads.length + ")" : "";
+  if (!leads.length) { return; }
+  var html = "";
+  for (var i = leads.length - 1; i >= 0; i = i - 1) {
+    var l = leads[i];
+    html += '<div class="lead"><span class="pill">' + l.status + '</span> <strong>' + l.name + "</strong>, " + l.phone + (l.email ? ", " + l.email : "") + (l.zip ? ", ZIP " + l.zip : "");
+    html += '<div class="muted">' + l.when + " | " + (l.trade === "pressure" ? "Pressure washing" : "House cleaning") + (l.date ? " | Preferred date: " + l.date : "") + "</div>";
+    html += "<div>" + l.summary + "</div>";
+    html += "<div><strong>Quoted estimate: " + money(l.low) + " to " + money(l.high) + "</strong> (total " + money(l.total) + ")</div>";
+    if (l.notes) { html += '<div class="muted">Notes: ' + l.notes + "</div>"; }
+    html += "</div>";
+  }
+  document.getElementById("leadList").innerHTML = html;
+  var last = leads[leads.length - 1];
+  var r = rules[last.trade];
+  document.getElementById("notifyCard").classList.remove("hidden");
+  document.getElementById("notifyText").textContent = "New quote lead: " + last.name + ", " + last.phone + ". " + last.summary + " Estimate sent: " + money(last.low) + " to " + money(last.high) + ". Reply to confirm the final price.";
+  var emailBody = "To: " + r.ownerEmail + "\nSubject: New quote lead, " + last.name + ", estimate " + money(last.low) + " to " + money(last.high) + "\n\nCustomer: " + last.name + "\nPhone: " + last.phone + "\nEmail: " + (last.email || "not given") + "\nZIP: " + (last.zip || "not given") + "\nPreferred date: " + (last.date || "not given") + "\n\n" + last.summary + "\n\nPrice breakdown:\n";
+  for (var j = 0; j < last.lines.length; j++) { emailBody += "  " + last.lines[j].label + ": " + money(last.lines[j].amount) + "\n"; }
+  emailBody += "\nEstimated total: " + money(last.total) + "\nNotes: " + (last.notes || "none");
+  document.getElementById("notifyEmail").textContent = emailBody;
+}
+
+var setupDefs = {
+  pressure: [ ["business", "Business name", "text"], ["ownerPhone", "Owner mobile for lead texts", "text"], ["ownerEmail", "Owner email for leads", "text"], ["houseRate", "House wash rate per sq ft ($)", "number"], ["houseMin", "House wash minimum ($)", "number"], ["drivewayPrice", "Driveway flat price ($)", "number"], ["twoStoryMult", "Two story multiplier", "number"], ["condMod", "Moderate condition multiplier", "number"], ["condHeavy", "Heavy condition multiplier", "number"], ["addSidewalk", "Add on: sidewalk ($)", "number"], ["addDeck", "Add on: deck or patio ($)", "number"], ["addFence", "Add on: fence wash ($)", "number"] ],
+  cleaning: [ ["business", "Business name", "text"], ["ownerPhone", "Owner mobile for lead texts", "text"], ["ownerEmail", "Owner email for leads", "text"], ["rate", "Cleaning rate per sq ft ($)", "number"], ["min", "Minimum visit price ($)", "number"], ["bathPrice", "Price per bathroom ($)", "number"], ["petPrice", "Pets in the home ($)", "number"], ["condAvg", "Average condition multiplier", "number"], ["condWork", "Needs work condition multiplier", "number"], ["addFridge", "Extra: inside fridge ($)", "number"], ["addOven", "Extra: inside oven ($)", "number"], ["addWindows", "Extra: interior windows ($)", "number"], ["addLaundry", "Extra: one load of laundry ($)", "number"] ]
+};
+
+function renderSetup() {
+  var trade = document.getElementById("setupTrade").value;
+  var defs = setupDefs[trade];
+  var r = rules[trade];
+  var html = "";
+  for (var i = 0; i < defs.length; i++) {
+    html += '<label for="s_' + defs[i][0] + '">' + defs[i][1] + '</label><input type="' + defs[i][2] + '" id="s_' + defs[i][0] + '" value="' + r[defs[i][0]] + '"' + (defs[i][2] === "number" ? ' step="0.01"' : "") + ">";
+  }
+  document.getElementById("setupFields").innerHTML = html;
+  document.getElementById("setupSaved").textContent = "";
+}
+
+function saveSetup() {
+  var trade = document.getElementById("setupTrade").value;
+  var defs = setupDefs[trade];
+  for (var i = 0; i < defs.length; i++) {
+    var el = document.getElementById("s_" + defs[i][0]);
+    rules[trade][defs[i][0]] = defs[i][2] === "number" ? Number(el.value) : el.value;
+  }
+  document.getElementById("setupSaved").textContent = " Saved. New quotes now use these prices.";
+  if (document.getElementById("tradeSelect").value === trade) { renderQuoteForm(); }
+}
+
+function stagedCheckout() {
+  document.getElementById("payNotice").innerHTML = '<div class="notice"><strong>Checkout is staged, not live.</strong> This plan will be a distinct product, Instant Quote Tool, $49 a month, in the Micro SaaS Stripe account under Matthew Wayne Chance, sole proprietor, with no setup fee. That account is being staged now; its identity, tax, and bank fields are completed by the account holder, and the first real charge waits on HQ release after the account is complete. No payment was taken here.</div>';
+}
+
+if (typeof document !== "undefined") {
+  renderQuoteForm();
+  renderSetup();
+}
+if (typeof module !== "undefined") { module.exports = { calculateQuote: calculateQuote, defaultRules: defaultRules }; }
+</script>
+</body>
+</html>
